@@ -40,13 +40,12 @@ INSTALLED_APPS = [
     'mygoods',
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -79,9 +78,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'system',
-        'USER': 'name',
-        'PASSWORD': 'password',
-        'HOST': '192.168.0.100',
+        'USER': 'lgh',
+        'PASSWORD': 'linguohao',
+        'HOST': '10.0.0.99',
         'PORT': '3306',
     }
 }

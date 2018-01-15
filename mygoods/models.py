@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Goods(models.Model):
-    time = models.DateField(auto_now_add=True, verbose_name=u'日期')
+    time = models.DateTimeField(auto_now_add=True, verbose_name=u'日期')
     kind = models.CharField(max_length=200, verbose_name=u'种类')
     goods_id = models.CharField(max_length=100, verbose_name=u'编号')
     summary = models.TextField(verbose_name=u'摘要')

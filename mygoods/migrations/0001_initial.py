@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='Goods',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('time', models.DateField(auto_now_add=True, verbose_name='\u65e5\u671f')),
+                ('time', models.DateTimeField(auto_now_add=True, verbose_name='\u65e5\u671f')),
                 ('kind', models.CharField(max_length=200, verbose_name='\u79cd\u7c7b')),
                 ('goods_id', models.CharField(max_length=100, verbose_name='\u7f16\u53f7')),
                 ('summary', models.TextField(verbose_name='\u6458\u8981')),

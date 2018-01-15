@@ -1,2 +1,2 @@
 # goods
-a simple goods system
+一个简单的订单系统，实现了登录操作，查看，修改，删除，订单等简单的功能
