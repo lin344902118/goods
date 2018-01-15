@@ -4,6 +4,7 @@ import datetime
 import json
 from django.shortcuts import render, redirect, HttpResponse
 from django.views.generic.base import View
+from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 from .models import Goods
 
 
@@ -64,5 +65,33 @@ class DeleteView(View):
             result['status'] = 'failed'
             result['message'] = str(e)
         return HttpResponse(json.dumps(result), content_type="application/json")
+
+
+class SearchView(View):
+    def post(self, request):
+        type = request.POST.get('type')
+        search = request.POST.get('search')
+        if not search:
+            goods = Goods.objects.all()
+        else:
+            if type == 'time':
+                search = datetime.datetime.strptime(search, '%Y-%m-%d')
+                goods = Goods.objects.filter(time__gte=search.date())
+            elif type == 'kind':
+                goods = Goods.objects.filter(kind__contains=search)
+            elif type == 'goods_id':
+                goods = Goods.objects.filter(goods_id=search)
+            else:
+                goods = Goods.objects.filter(summary__contains=search)
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        except EmptyPage:
+            page = 1
+        p = Paginator(goods, per_page=20, request=request)
+        goods = p.page(page)
+        return render(request, 'show_goods.html', {'goods': goods})
+
 
 

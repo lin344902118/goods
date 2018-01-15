@@ -14,12 +14,12 @@
 </head>
 <body>
     <h1>欢迎使用记账系统</h1>
-     <div class="col-sm-offset-10">
-     {% if request.user.is_active %}
+    <div class="col-sm-offset-10">
+        {% if request.user.is_active %}
         <a href="/logout">注销</a>
-     {% endif %}
-     </div>
-     {% block body %}{% endblock %}
+        {% endif %}
+    </div>
+    {% block body %}{% endblock %}
 </body>
 <script src="{% static 'jquery-3.2.1.min.js' %}"></script>
 <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.js' %}"></script>
