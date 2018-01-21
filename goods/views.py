@@ -10,7 +10,7 @@ class IndexView(View):
     def get(self, request):
         if not request.user.is_active:
             return redirect('/login')
-        goods = Goods.objects.all()
+        goods = Goods.objects.filter(state=0)
         try:
             page = request.GET.get('page', 1)
         except PageNotAnInteger:

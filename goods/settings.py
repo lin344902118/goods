@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -80,8 +81,12 @@ DATABASES = {
         'NAME': 'system',
         'USER': 'name',
         'PASSWORD': 'password',
-        'HOST': '10.0.0.99',
+        'HOST': '192.168.0.100',
         'PORT': '3306',
+        'OPTIONS': {
+            'autocommit': True,
+            'init_command': 'SET sql_mode="STRICT_TRANS_TABLES"',
+        }
     }
 }
 
@@ -124,3 +129,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

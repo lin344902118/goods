@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.static import serve
+from .settings import MEDIA_ROOT
 from .views import IndexView, LogoutView, LoginView
 
 urlpatterns = [
@@ -23,5 +25,6 @@ urlpatterns = [
     url(r'^index$', IndexView.as_view(), name='index'),
     url(r'^logout$', LogoutView.as_view(), name='logout'),
     url(r'^login', LoginView.as_view(), name='login'),
-    url(r'^goods/', include('mygoods.urls'))
+    url(r'^goods/', include('mygoods.urls')),
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
 ]

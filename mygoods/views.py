@@ -1,5 +1,8 @@
 # -*- coding:utf-8 -*-
 
+from goods.settings import MEDIA_ROOT
+import os
+from PIL import Image
 import datetime
 import json
 from django.shortcuts import render, redirect, HttpResponse
@@ -16,11 +19,15 @@ class AddView(View):
         time = datetime.datetime.now()
         kind = request.POST.get('kind')
         goods_id = request.POST.get('goods_id')
+        reqfile = request.FILES.get('image')
+        img = Image.open(reqfile)
+        dir = os.path.join(MEDIA_ROOT, 'goods')
+        img.save(dir+'\\'+reqfile.name)
         summary = request.POST.get('summary', '')
         get_in = int(request.POST.get('get_in'))
         get_out = int(request.POST.get('get_out'))
         get_left = get_in - get_out
-        result = Goods.objects.create(time=time, kind=kind, goods_id=goods_id, summary=summary, get_in=get_in, get_out=get_out, get_left=get_left)
+        result = Goods.objects.create(time=time, kind=kind, goods_id=goods_id, image='/goods/'+reqfile.name, summary=summary, get_in=get_in, get_out=get_out, get_left=get_left)
         if result:
             return redirect('/index')
         else:
@@ -53,8 +60,29 @@ class DeleteView(View):
         result = dict()
         try:
             id = request.GET.get('id')
-            status = Goods.objects.filter(id=id).delete()
-            if status[0]:
+            status = Goods.objects.filter(id=id).update(state=1)
+            if status:
+                result['ret'] = 0
+                result['status'] = 'success'
+            else:
+                result['ret'] = 1
+                result['status'] = 'failed'
+        except Exception as e:
+            result['ret'] = 10000
+            result['status'] = 'failed'
+            result['message'] = str(e)
+        return HttpResponse(json.dumps(result), content_type="application/json")
+
+
+class RecoverView(View):
+    def get(self, request):
+        if not request.user.is_active:
+            return redirect('/login')
+        result = dict()
+        try:
+            id = request.GET.get('id')
+            status = Goods.objects.filter(id=id).update(state=0)
+            if status:
                 result['ret'] = 0
                 result['status'] = 'success'
             else:

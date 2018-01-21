@@ -18,10 +18,12 @@
             <td>时间</td>
             <td>种类</td>
             <td>商品编号</td>
+            <td>图片</td>
             <td>摘要</td>
             <td>收入数量</td>
             <td>支出数量</td>
             <td>结余数量</td>
+            <td>状态</td>
             <td>操作</td>
         </tr>
         {% for good in goods.object_list %}
@@ -30,22 +32,34 @@
                 <td>{{ good.time }}</td>
                 <td>{{ good.kind }}</td>
                 <td>{{ good.goods_id }}</td>
+                <td><img src="{{ MEDIA_URL }}{{ good.image }}" /></td>
                 <td>{{ good.summary }}</td>
                 <td>{{ good.get_in }}</td>
                 <td>{{ good.get_out }}</td>
                 <td>{{ good.get_left }}</td>
                 <td>
-                    <button type="button" class="btn btn-info" id="modify">修改</button>
-                    <button type="button" class="btn btn-danger" id="delete">删除</button>
+                    {% if good.state %}
+                        已删除
+                    {% else %}
+                        正常
+                    {% endif %}
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info" onclick="modify_goods(this)">修改</button>
+                    {% if not good.state %}
+                        <button type="button" class="btn btn-danger" onclick="delete_goods(this)">删除</button>
+                    {% else %}
+                        <button type="button" class="btn btn-danger" onclick="recover_goods(this)">恢复</button>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}
 
     </table>
     <div class="col-sm-offset-10">
-        <button type="button" class="btn btn-primary" id="add">添加</button>
+        <button type="button" class="btn btn-primary" onclick="show_form()">添加</button>
     </div>
-    <form method="post" action="/goods/add" class="form-horizontal" style="display:none" id="add_form">
+    <form method="post" action="/goods/add" class="form-horizontal" style="display:none" id="add_form" enctype="multipart/form-data">
         <input id="id" style="display:none" name="id">
         <div class="form-group">
             <label class="col-sm-offset-3 col-sm-2 control-label">种类:</label>
@@ -57,6 +71,12 @@
             <label class="col-sm-offset-3 col-sm-2 control-label">编号:</label>
             <div class="col-sm-3">
                 <input type="text" class="form-control" name="goods_id" id="goods_id" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-offset-3 col-sm-2 control-label">图片:</label>
+            <div class="col-sm-3">
+                <input type="file" name="image" id="image">
             </div>
         </div>
         <div class="form-group">
@@ -89,49 +109,70 @@
 {% endblock %}
 {% block script %}
     <script>
-        $(document).ready(function(){
-            $('#add').click(function(){
-                $('#add_form')[0].style.display='block';
-            });
-            $('#modify').click(function(){
-                $('#add_form')[0].style.display='block';
-                var id = this.parentNode.parentNode.childNodes[1].textContent;
-                var kind = this.parentNode.parentNode.childNodes[5].textContent;
-                var goods_id = this.parentNode.parentNode.childNodes[7].textContent;
-                var summary = this.parentNode.parentNode.childNodes[9].textContent;
-                var get_in = this.parentNode.parentNode.childNodes[11].textContent;
-                var get_out = this.parentNode.parentNode.childNodes[13].textContent;
-                $('#id')[0].value = id;
-                $('#kind')[0].value = kind;
-                $('#goods_id')[0].value = goods_id;
-                $('#summary')[0].value = summary;
-                $('#get_in')[0].value = get_in;
-                $('#get_out')[0].value = get_out;
-                $('#add_form')[0].action = '/goods/modify'
-            });
-            $('#delete').click(function(){
-                var id = this.parentNode.parentNode.childNodes[1].textContent;
-                if (confirm('确定要删除吗?')){
-                    $.ajax({
-                        type: 'get',
-                        url: '/goods/delete',
-                        data: {'id':id},
-                        async: false,
-                        success: function (data, status) {
-                            if (data.ret == 0) {
-                                alert('删除成功!');
-                　　　　　　　　location.reload()
-                            }
-                            else {
-                                alert("删除失败!失败原因:" + data.message);
-                            }
-                        },
-                        error: function (data) {
-                            alert("删除错误!错误原因:" + data);
+        function show_form(){
+            $('#add_form')[0].style.display='block';
+        };
+        function modify_goods(node){
+            $('#add_form')[0].style.display='block';
+            var id = node.parentNode.parentNode.childNodes[1].textContent;
+            var kind = node.parentNode.parentNode.childNodes[5].textContent;
+            var goods_id = node.parentNode.parentNode.childNodes[7].textContent;
+            var summary = node.parentNode.parentNode.childNodes[11].textContent;
+            var get_in = node.parentNode.parentNode.childNodes[13].textContent;
+            var get_out = node.parentNode.parentNode.childNodes[15].textContent;
+            $('#id')[0].value = id;
+            $('#kind')[0].value = kind;
+            $('#goods_id')[0].value = goods_id;
+            $('#summary')[0].value = summary;
+            $('#get_in')[0].value = get_in;
+            $('#get_out')[0].value = get_out;
+            $('#add_form')[0].action = '/goods/modify';
+        };
+        function delete_goods(node){
+            var id = node.parentNode.parentNode.childNodes[1].textContent;
+            if (confirm('确定要删除吗?')){
+                $.ajax({
+                    type: 'get',
+                    url: '/goods/delete',
+                    data: {'id':id},
+                    async: false,
+                    success: function (data, status) {
+                        if (data.ret == 0) {
+                            alert('删除成功!');
+            　　　　　　　　location.reload()
                         }
-                    });
-                }
-            });
-        });
+                        else {
+                            alert("删除失败!失败原因:" + data.message);
+                        }
+                    },
+                    error: function (data) {
+                        alert("删除错误!错误原因:" + data);
+                    }
+                });
+            };
+        };
+        function recover_goods(node){
+            var id = node.parentNode.parentNode.childNodes[1].textContent;
+            if (confirm('确定要恢复吗?')){
+                $.ajax({
+                    type: 'get',
+                    url: '/goods/recover',
+                    data: {'id':id},
+                    async: false,
+                    success: function (data, status) {
+                        if (data.ret == 0) {
+                            alert('恢复成功!');
+            　　　　　　　　location.reload()
+                        }
+                        else {
+                            alert("恢复失败!失败原因:" + data.message);
+                        }
+                    },
+                    error: function (data) {
+                        alert("恢复错误!错误原因:" + data);
+                    }
+                });
+            }
+        };
     </script>
 {% endblock %}
